@@ -9,8 +9,13 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.jiavan.libgdx.orz.bodydata.BoomData;
 import com.jiavan.libgdx.orz.bodydata.BoxData;
+import com.jiavan.libgdx.orz.bodydata.BulletData;
 import com.jiavan.libgdx.orz.bodydata.GroundData;
+import com.jiavan.libgdx.orz.bodydata.PlayerData;
+import com.jiavan.libgdx.orz.bodydata.TurretData;
+import com.jiavan.libgdx.orz.common.BodyConfig;
 
 /**
  * Body工厂类
@@ -35,7 +40,7 @@ public class BodyFactory {
 		
 		//为body设置shape
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(0.5f, 0.5f);
+		shape.setAsBox(BodyConfig.boxHalfWidth, BodyConfig.boxHalfWidth);
 		
 		//为body设置夹具
 		FixtureDef fixture = new FixtureDef();
@@ -90,11 +95,12 @@ public class BodyFactory {
 	 * @param Vector2 position 初始位置
 	 * @return
 	 */
-	public static Body createActor(World world, Vector2 position) {
+	public static Body createPlayer(World world, Vector2 position) {
 		BodyDef def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		def.position.set(position);
 		Body body = world.createBody(def);
+		body.setUserData(new PlayerData());
 		
 		CircleShape shape = new CircleShape();
 		shape.setRadius(0.5f);
@@ -104,6 +110,111 @@ public class BodyFactory {
 		fixture.density = 0.5f;
 		fixture.friction = 0.5f;
 		fixture.restitution = 0;
+		body.createFixture(fixture);
+		
+		return body;
+	}
+	
+	/**
+	 * 创建一个炮塔
+	 * @param World world
+	 * @param Vector2 position
+	 * @return
+	 */
+	public static Body createTurret(World world, Vector2 position) {
+		BodyDef def = new BodyDef();
+		def.type = BodyType.DynamicBody;
+		def.position.set(position);
+		Body body = world.createBody(def);
+		body.setUserData(new TurretData());
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(0.6f, 0.45f);
+		
+		FixtureDef fixture = new FixtureDef();
+		fixture.density = 50f;
+		fixture.friction = 0.5f;
+		fixture.restitution = 0f;
+		fixture.shape = shape;
+		body.createFixture(fixture);
+		
+		return body;
+	}
+	
+	/**
+	 * 创建一颗子弹
+	 * @param World world
+	 * @param Body player 游戏主角
+	 * @return
+	 */
+	public static Body createBullet(World world, Body player, Vector2 position) {
+		BodyDef def = new BodyDef();
+		def.type = BodyType.DynamicBody;
+		def.position.set(position);
+		Body body = world.createBody(def);
+		body.setBullet(true);
+		body.setUserData(new BulletData());
+		
+		CircleShape shape = new CircleShape();
+		shape.setRadius(BodyConfig.bulletRadius);
+		
+		FixtureDef fixture = new FixtureDef();
+		fixture.density = 1f;
+		fixture.friction = 0.5f;
+		fixture.restitution = 0f;
+		fixture.shape = shape;
+		body.createFixture(fixture);
+		
+		return body;
+	}
+	
+	/**
+	 * 创建一颗炸弹
+	 * @param world
+	 * @param turret 炮塔
+	 * @return
+	 */
+	public static Body createBoom(World world, Body turret) {
+		BodyDef def = new BodyDef();
+		def.type = BodyType.DynamicBody;
+		def.position.set(turret.getPosition().x - 0.6f, turret.getPosition().y);
+		Body body = world.createBody(def);
+		body.setGravityScale(0);
+		body.setUserData(new BoomData());
+		
+		CircleShape shape = new CircleShape();
+		shape.setRadius(0.2f);
+		
+		FixtureDef fixture = new FixtureDef();
+		fixture.density = 1;
+		fixture.restitution = 0.1f;
+		fixture.shape = shape;
+		body.createFixture(fixture);
+		
+		return body;
+	}
+	
+	/***
+	 * 创建一架飞机
+	 * @param world
+	 * @param position
+	 * @return
+	 */
+	public static Body createPlane(World world, Vector2 position) {
+		BodyDef def = new BodyDef();
+		def.type = BodyType.DynamicBody;
+		def.position.set(position);
+		Body body = world.createBody(def);
+		body.setUserData(new PlayerData());
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(0.3f, 0.3f);
+		
+		FixtureDef fixture = new FixtureDef();
+		fixture.shape = shape;
+		fixture.density = 0.5f;
+		fixture.restitution = 0;
+		fixture.friction = 0;
 		body.createFixture(fixture);
 		
 		return body;

@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.jiavan.libgdx.orz.BodyFactory;
+import com.badlogic.gdx.math.Vector2;
+import com.jiavan.libgdx.orz.common.BodyConfig;
 
 /**
  * Box UserData
@@ -15,46 +14,59 @@ import com.jiavan.libgdx.orz.BodyFactory;
  */
 public class BoxData {
 	public static String name = "box";
-	private static Texture texture;
-	public float x;
-	public float y;
-	public float angle;
-	public Sprite sprite;
+	private Vector2 position;
+	private float angle;
+	private Sprite box;
 	
+	/**
+	 * 初始化精灵
+	 */
 	public BoxData() {
-		texture = new Texture(Gdx.files.internal("data/box.png"));
-		sprite = new Sprite(texture);
+		this.box = new Sprite(new Texture(Gdx.files.internal("data/box.png")));
 	}
 	
-	/*public void draw(Stage stage, Body body, SpriteBatch batch) {
-		sprite.setPosition(body.getPosition().x - BodyFactory.boxHalfWidth,
-				body.getPosition().y - BodyFactory.boxHalfWidth);
-		sprite.setOrigin(body.getPosition().x, body.getPosition().y);
-		sprite.setSize(2*BodyFactory.boxHalfWidth, 2*BodyFactory.boxHalfWidth);
-		sprite.draw(batch);
-	}*/
+	/**
+	 * 绘制精灵
+	 * @param batch
+	 */
+	public void draw(SpriteBatch batch) {
+		box.setPosition(position.x - BodyConfig.boxHalfWidth, 
+				position.y - BodyConfig.boxHalfWidth);//设置子弹的位置
+		box.setSize(BodyConfig.boxHalfWidth*2, BodyConfig.boxHalfWidth*2);//设置子弹的大小
+		box.setOrigin(box.getWidth() / 2, box.getHeight() / 2);
+		box.setRotation((float) (angle*180/Math.PI));
+		box.draw(batch);//在舞台中绘制
+	}
 	
-	public float getX() {
-		return x;
-	}
-
-	public void setX(float x) {
-		this.x = x;
-	}
-
-	public float getY() {
-		return y;
-	}
-
-	public void setY(float y) {
-		this.y = y;
-	}
-
+	/**
+	 * 获取旋转角度
+	 * @return
+	 */
 	public float getAngle() {
 		return angle;
 	}
 
+	/**
+	 * 设置旋转角度
+	 * @param angle
+	 */
 	public void setAngle(float angle) {
 		this.angle = angle;
+	}
+
+	/**
+	 * 获取箱子的位置
+	 * @return
+	 */
+	public Vector2 getPosition() {
+		return position;
+	}
+	
+	/**
+	 * 设置子弹的位置
+	 * @param position
+	 */
+	public void setPosition(Vector2 position) {
+		this.position = position;
 	}
 }
